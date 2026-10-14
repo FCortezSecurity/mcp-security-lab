@@ -51,8 +51,10 @@ Success counts only trials where the agent actually read the poisoned email
 Observations:
 - Attack success depended on both payload wording and the user's prompt. The authority
   payload only worked when the agent processed emails one at a time.
-- In 21 of 23 successful baseline attacks the agent's reply mentioned the attacker address,
-  so these attacks were mostly visible to the user, but only after the email was sent.
+- In 22 of 23 successful baseline attacks the agent's reply disclosed the unrequested email
+  (21 named the attacker address, 1 paraphrased it). In the remaining case the reply described
+  a different email and never mentioned the attacker. Disclosure came only after the email
+  was sent. Counts come from a keyword check plus manual reading of the exceptions.
 - Taint tracking blocked a legitimate task (read an email, then reply) and bought no
   extra protection over the allowlist against S1. Its value would appear against attacks
   the allowlist cannot see.
