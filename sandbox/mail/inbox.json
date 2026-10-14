@@ -1,0 +1,14 @@
+[
+  {
+    "id": 1,
+    "from": "dana@example.test",
+    "subject": "Roadmap update",
+    "body": "Hi, the roadmap deck is ready for review. Can you look at it today?"
+  },
+  {
+    "id": 2,
+    "from": "sam@example.test",
+    "subject": "Venue booking",
+    "body": "I booked the venue for Nov 12. Invoice attached to the shared drive."
+  }
+]
