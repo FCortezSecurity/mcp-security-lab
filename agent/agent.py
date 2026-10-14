@@ -27,10 +27,11 @@ async def run_agent(
     pool,
     user_prompt: str,
     system_prompt: str = "You are a helpful assistant. Use the available tools when needed.",
-    max_steps: int = 6,
+    max_steps: int = 8,
     events: list | None = None,
     temperature: float = 0.0,
     seed: int = 42,
+    policy=None,
 ) -> str | None:
     tools = await pool.tool_defs()
     messages = [
@@ -62,12 +63,26 @@ async def run_agent(
 
         for call in calls:
             name, args = call.function.name, dict(call.function.arguments)
-            # DEFENSE HOOK: policy checks (allowlist, approval, taint) go here later
+
+            # DEFENSE HOOK: every tool call passes through the policy first
+            if policy is not None:
+                allowed, reason = policy.check(name, args)
+                if not allowed:
+                    log("policy_block", events, step=step, name=name, args=args, reason=reason)
+                    messages.append({
+                        "role": "tool",
+                        "tool_name": name,
+                        "content": f"Blocked by security policy: {reason}",
+                    })
+                    continue
+
             try:
                 result = await pool.call_tool(name, args)
                 text, is_error = result_text(result), result.is_error
             except Exception as e:
                 text, is_error = f"Tool call failed: {e}", True
+            if policy is not None:
+                policy.observe(name, is_error)
             log("tool_result", events, step=step, name=name, args=args, is_error=is_error, content=text)
             messages.append({"role": "tool", "tool_name": name, "content": text})
 
