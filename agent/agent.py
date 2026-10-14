@@ -9,11 +9,14 @@ MODEL = "qwen2.5:7b"
 LOG_PATH = Path("logs/agent.jsonl")
 
 
-def log(event: str, **data) -> None:
-    """Append one JSON event per line. Every prompt, tool call and result goes here."""
+def log(event: str, sink: list | None = None, **data) -> None:
+    """Append one JSON event per line; optionally also collect it in `sink`."""
+    rec = {"ts": time.time(), "event": event, **data}
     LOG_PATH.parent.mkdir(exist_ok=True)
     with LOG_PATH.open("a", encoding="utf-8") as f:
-        f.write(json.dumps({"ts": time.time(), "event": event, **data}) + "\n")
+        f.write(json.dumps(rec) + "\n")
+    if sink is not None:
+        sink.append(rec)
 
 
 def result_text(result) -> str:
@@ -25,13 +28,14 @@ async def run_agent(
     user_prompt: str,
     system_prompt: str = "You are a helpful assistant. Use the available tools when needed.",
     max_steps: int = 6,
+    events: list | None = None,
 ) -> str | None:
     tools = await pool.tool_defs()
     messages = [
         {"role": "system", "content": system_prompt},
         {"role": "user", "content": user_prompt},
     ]
-    log("user_prompt", content=user_prompt, tools=[t["function"]["name"] for t in tools])
+    log("user_prompt", events, content=user_prompt, tools=[t["function"]["name"] for t in tools])
 
     for step in range(max_steps):
         resp = ollama.chat(
@@ -45,6 +49,7 @@ async def run_agent(
         calls = msg.tool_calls or []
         log(
             "model_response",
+            events,
             step=step,
             content=msg.content,
             tool_calls=[{"name": c.function.name, "args": dict(c.function.arguments)} for c in calls],
@@ -59,10 +64,10 @@ async def run_agent(
             try:
                 result = await pool.call_tool(name, args)
                 text, is_error = result_text(result), result.is_error
-            except Exception as e:  # bad tool name, bad args, etc.
+            except Exception as e:
                 text, is_error = f"Tool call failed: {e}", True
-            log("tool_result", step=step, name=name, args=args, is_error=is_error, content=text)
+            log("tool_result", events, step=step, name=name, args=args, is_error=is_error, content=text)
             messages.append({"role": "tool", "tool_name": name, "content": text})
 
-    log("max_steps_reached")
+    log("max_steps_reached", events)
     return None
