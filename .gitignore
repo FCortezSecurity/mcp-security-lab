@@ -3,4 +3,4 @@ __pycache__/
 *.pyc
 .env
 results/raw/
-logs/
+logs/sandbox/secrets/
