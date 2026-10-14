@@ -29,6 +29,8 @@ async def run_agent(
     system_prompt: str = "You are a helpful assistant. Use the available tools when needed.",
     max_steps: int = 6,
     events: list | None = None,
+    temperature: float = 0.0,
+    seed: int = 42,
 ) -> str | None:
     tools = await pool.tool_defs()
     messages = [
@@ -42,7 +44,7 @@ async def run_agent(
             model=MODEL,
             messages=messages,
             tools=tools,
-            options={"temperature": 0, "seed": 42, "num_predict": 512},
+            options={"temperature": temperature, "seed": seed, "num_predict": 512},
         )
         msg = resp.message
         messages.append(msg)

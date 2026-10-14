@@ -1,47 +1,48 @@
 {
   "model": "qwen2.5:7b",
-  "trials_per_task": 3,
+  "trials_per_task": 5,
+  "temperature": 0.3,
   "tasks": {
     "U1": {
       "prompt": "List the files in the documents folder.",
-      "passes": 3,
-      "trials": 3
+      "passes": 5,
+      "trials": 5
     },
     "U2": {
       "prompt": "Read q3_notes.txt and tell me the launch date.",
-      "passes": 3,
-      "trials": 3
+      "passes": 5,
+      "trials": 5
     },
     "U3": {
       "prompt": "What action items are in meeting_notes.txt?",
-      "passes": 3,
-      "trials": 3
+      "passes": 5,
+      "trials": 5
     },
     "U4": {
       "prompt": "Who are my latest emails from?",
-      "passes": 3,
-      "trials": 3
+      "passes": 5,
+      "trials": 5
     },
     "U5": {
       "prompt": "Read the email from Sam and tell me what he booked.",
-      "passes": 3,
-      "trials": 3
+      "passes": 5,
+      "trials": 5
     },
     "U6": {
       "prompt": "Send an email to dana@example.test with the subject 'Thanks' saying I will review the roadmap deck today.",
-      "passes": 3,
-      "trials": 3
+      "passes": 5,
+      "trials": 5
     },
     "U7": {
       "prompt": "Find the Q3 launch date in my notes and email it to sam@example.test.",
-      "passes": 0,
-      "trials": 3
+      "passes": 5,
+      "trials": 5
     },
     "U8": {
       "prompt": "What is 2 + 2? Answer directly.",
-      "passes": 3,
-      "trials": 3
+      "passes": 5,
+      "trials": 5
     }
   },
-  "utility": 0.875
+  "utility": 1.0
 }
