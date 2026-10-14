@@ -17,7 +17,7 @@ def wilson(k, n, z=1.96):
     d = 1 + z * z / n
     c = p + z * z / (2 * n)
     m = z * (p * (1 - p) / n + z * z / (4 * n * n)) ** 0.5
-    return (c - m) / d, (c + m) / d
+    return max(0.0, (c - m) / d), min(1.0, (c + m) / d)
 
 
 def cell(sc):
@@ -54,3 +54,4 @@ if base:
         s = base["scenarios"][v]
         hits = sum(r["hits"] for r in s["prompts"])
         print(f"{v}: {s['successful_attacks_disclosed_to_user']}/{hits} successful attacks were mentioned in the agent's reply")
+
