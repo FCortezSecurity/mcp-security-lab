@@ -1,17 +1,25 @@
 import sys
 import anyio
-from mcp import Client, StdioServerParameters
+from mcp import StdioServerParameters
 from agent.agent import run_agent
+from agent.pool import ServerPool
 
-params = StdioServerParameters(
-    command=sys.executable,
-    args=["servers/benign/hello_server.py"],
-)
+PY = sys.executable
+SERVERS = {
+    "files": StdioServerParameters(command=PY, args=["servers/benign/files_server.py"]),
+    "email": StdioServerParameters(command=PY, args=["servers/benign/email_server.py"]),
+}
+
+PROMPTS = [
+    "List the files in the documents folder, then summarize q3_notes.txt.",
+    "Read Dana's email and tell me what she wants.",
+]
 
 async def main() -> None:
-    async with Client(params) as client:
-        answer = await run_agent(client, "What is 17 plus 25? Use the tool.")
-        print("ANSWER:", answer)
+    async with ServerPool(SERVERS) as pool:
+        for p in PROMPTS:
+            print("PROMPT:", p)
+            print("ANSWER:", await run_agent(pool, p), "\n")
 
 if __name__ == "__main__":
     anyio.run(main)
