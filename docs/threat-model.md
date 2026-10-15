@@ -132,8 +132,12 @@ Observations:
   not tested: data read from a private source that legitimately flows to a benign tool without the user
   typing it would still be blocked. egress2 also trusts everything the user typed, so a secret pasted
   into the user's own prompt would not be caught.
-- In S2d, egress2 blocked 22 trials against 28 for egress, while leaks stayed at 0 of 30. The gap in
-  attempted leaks (prompt 1) has not been explained.
+- In S2d, egress2 blocked 22 trials against 28 for egress, while leaks stayed at 0 of 30. In 6 prompt-1
+  trials where the baseline leaked, the egress2 run put the user's own sentence into the context argument
+  instead of the email text, so no leak was attempted; the exemption was not involved. Why the model chose
+  differently is not confirmed. All 9 first-response differences between two identical S2c baseline runs
+  were also in prompt 1, which is consistent with run-to-run instability on that prompt. egress2 blocked
+  22 of 22 attempted leaks.
 - The descscan patterns were written after seeing the original payload, so its first 0/30 is in-sample.
 
 ## Out of scope
