@@ -63,7 +63,9 @@ Observations:
 - One 7B model; absolute rates will not transfer to other models. The before/after
   differences are the finding.
 - 30 trials per cell: 0/30 means "below roughly 11%", not zero.
-- Fixed seeds make defended runs paired with the baseline, not independent samples.
+- Defended and baseline runs are not trial-for-trial comparable: in the S2c egress run the model's
+  first response differed from the baseline in 11 of 30 exfil trials, before any policy action was
+  possible. They are treated as independent samples.
 - The allowlist is hard-coded to fixture contacts and assumes the attacker cannot add
   themselves to it. Taint sources are email bodies only; file reads do not taint.
 - The attacker is non-adaptive. An adaptive attacker was not tested.
