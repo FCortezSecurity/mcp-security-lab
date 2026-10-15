@@ -116,7 +116,9 @@ Observations:
   one attempt, not tuned against the model). No attacker adapted to egress, for example by paraphrasing or
   encoding the data before sending.
 - egress matches literal tokens of 12+ characters, so shorter secrets and transformed data would pass. A
-  legitimate call that repeats an email address read earlier would likely be blocked; this was not tested.
+  legitimate call that repeats an email address the user typed was blocked in 20 of 30 trials of a benign-tool
+  check (S2e; no blocks without the defense). This test used one address and three prompts, so it shows the
+  false positive exists but not how often it occurs.
 - The descscan patterns were written after seeing the original payload, so its first 0/30 is in-sample.
 
 ## Out of scope
