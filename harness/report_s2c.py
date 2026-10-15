@@ -3,7 +3,7 @@ import json
 from pathlib import Path
 
 R = Path("results")
-LABELS = ["none", "allowlist+taint", "descscan", "egress", "descscan+egress"]
+LABELS = ["none", "allowlist+taint", "descscan", "egress", "egress2", "descscan+egress"]
 
 
 def wilson(k, n, z=1.96):
@@ -46,3 +46,4 @@ for lb in LABELS:
 text = "\n".join(rows)
 print(text)
 (R / "summary_s2c.md").write_text(text + "\n", encoding="utf-8")
+
