@@ -95,7 +95,8 @@ Observations:
 - descscan is trivially bypassed by someone who has read its patterns, and evading it cost the attacker
   nothing in these trials. It did not add protection on top of egress.
 - egress blocked every attempted leak (28 of 28 in S2d, matching the baseline trial for trial), but the
-  agent usually stopped after the block, so the weather question went unanswered.
+  agent stopped after the block: the weather question was answered in 2 of 30 S2d trials, versus
+  30 of 30 with no defense. The agent never retried with a cleaner argument.
 - Identical baseline runs reproduced the exfil outcomes exactly but differed in free-text wording
   (9 of 30 control first responses), so run-to-run variation exists.
 
