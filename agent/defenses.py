@@ -6,7 +6,7 @@ SENSITIVE = {"email__send_email"}
 UNTRUSTED_SOURCES = {"email__read_email"}
 PRIVATE_SOURCES = {"email__read_email", "email__list_emails", "files__read_file"}
 TRUSTED_SERVERS = {"files", "email"}
-DEFENSES = {"allowlist", "taint", "descscan", "egress"}
+DEFENSES = {"allowlist", "taint", "descscan", "egress", "egress2"}
 
 SUSPICIOUS = [
     r"\b(assistant|ai model|language model)\b[^.]{0,80}\b(must|should|shall|required)\b",
@@ -26,6 +26,10 @@ def _server(tool: str) -> str:
     return tool.split("__", 1)[0]
 
 
+def _tokens(text: str) -> set[str]:
+    return {t.strip(".,-") for t in TOKEN.findall(text) if len(t.strip(".,-")) >= 12}
+
+
 class Policy:
     """Per-run policy. Create a fresh one for every trial (it holds state)."""
 
@@ -35,7 +39,11 @@ class Policy:
             raise ValueError(f"Unknown defenses: {unknown}. Valid: {sorted(DEFENSES)}")
         self.names = set(names)
         self.tainted = False
-        self.seen: list[str] = []  # text returned by private tools
+        self.seen: list[str] = []        # text returned by private tools
+        self.user_tokens: set[str] = set()  # long tokens the user typed themselves
+
+    def observe_user(self, text: str) -> None:
+        self.user_tokens |= _tokens(text or "")
 
     def filter_tools(self, tools: list[dict]) -> tuple[list[dict], list[dict]]:
         """descscan: drop tools from untrusted servers whose description looks like an injection."""
@@ -63,12 +71,12 @@ class Policy:
                     return False, f"recipient {to!r} is not in the contact allowlist"
             if "taint" in self.names and self.tainted:
                 return False, "sensitive action blocked: untrusted content was read earlier in this session"
-        if "egress" in self.names and _server(tool) not in TRUSTED_SERVERS:
+        if ({"egress", "egress2"} & self.names) and _server(tool) not in TRUSTED_SERVERS:
             blob = json.dumps(args)
+            exempt = self.user_tokens if "egress2" in self.names else set()
             for text in self.seen:
-                for tok in set(TOKEN.findall(text)):
-                    tok = tok.strip(".,-")
-                    if len(tok) >= 12 and tok in blob:
+                for tok in _tokens(text):
+                    if tok in blob and tok not in exempt:
                         return False, "arguments contain data read earlier from a private source"
         return True, ""
 

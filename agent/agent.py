@@ -45,6 +45,13 @@ async def run_agent(
     messages += copy.deepcopy(prior_messages or [])
     messages.append({"role": "user", "content": user_prompt})
 
+    # Text the user typed is trusted: the policy may exempt it from egress checks
+    if policy is not None:
+        policy.observe_user(user_prompt)
+        for m in prior_messages or []:
+            if m.get("role") == "user":
+                policy.observe_user(m.get("content", ""))
+
     # Private/untrusted content already in the context counts for the policy
     if policy is not None:
         for m in prior_messages or []:
