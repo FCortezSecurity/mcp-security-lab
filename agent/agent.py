@@ -36,15 +36,20 @@ async def run_agent(
     prior_messages: list | None = None,
 ) -> str | None:
     tools = await pool.tool_defs()
+    if policy is not None:
+        tools, removed = policy.filter_tools(tools)
+        if removed:
+            log("tools_quarantined", events, removed=removed)
+
     messages = [{"role": "system", "content": system_prompt}]
     messages += copy.deepcopy(prior_messages or [])
     messages.append({"role": "user", "content": user_prompt})
 
-    # Untrusted content already in the context counts as taint for the policy
+    # Private/untrusted content already in the context counts for the policy
     if policy is not None:
         for m in prior_messages or []:
             if m.get("role") == "tool":
-                policy.observe(m.get("tool_name", ""), False)
+                policy.observe(m.get("tool_name", ""), False, m.get("content", ""))
 
     log("user_prompt", events, content=user_prompt,
         tools=[t["function"]["name"] for t in tools],
@@ -92,7 +97,7 @@ async def run_agent(
             except Exception as e:
                 text, is_error = f"Tool call failed: {e}", True
             if policy is not None:
-                policy.observe(name, is_error)
+                policy.observe(name, is_error, text)
             log("tool_result", events, step=step, name=name, args=args, is_error=is_error, content=text)
             messages.append({"role": "tool", "tool_name": name, "content": text})
 
