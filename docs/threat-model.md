@@ -65,7 +65,10 @@ Observations:
 - 30 trials per cell: 0/30 means "below roughly 11%", not zero.
 - Defended and baseline runs are not trial-for-trial comparable: in the S2c egress run the model's
   first response differed from the baseline in 11 of 30 exfil trials, before any policy action was
-  possible. They are treated as independent samples.
+  possible. Two identical baseline runs also differed in the first response in 9 of 30 control
+  trials, so exact run-to-run reproducibility is not guaranteed. Defended and baseline runs are
+  treated as independent samples, and trial i uses seed i in every cell, so the confidence
+  intervals are approximate.
 - The allowlist is hard-coded to fixture contacts and assumes the attacker cannot add
   themselves to it. Taint sources are email bodies only; file reads do not taint.
 - The attacker is non-adaptive. An adaptive attacker was not tested.
