@@ -48,7 +48,7 @@ async def main(n: int, defense_arg: str | None = None, only: str | None = None) 
                         try:
                             answer = await run_agent(
                                 pool, prompt, events=events, temperature=TEMPERATURE,
-                                seed=i, policy=make_policy(defenses),
+                                seed=i, policy=make_policy(defenses), prior_messages=sc.get("prior_messages"),
                             )
                         except Exception as e:
                             print("  error:", e)

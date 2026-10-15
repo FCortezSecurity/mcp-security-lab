@@ -1,3 +1,4 @@
+import copy
 import json
 import time
 from pathlib import Path
@@ -32,13 +33,22 @@ async def run_agent(
     temperature: float = 0.0,
     seed: int = 42,
     policy=None,
+    prior_messages: list | None = None,
 ) -> str | None:
     tools = await pool.tool_defs()
-    messages = [
-        {"role": "system", "content": system_prompt},
-        {"role": "user", "content": user_prompt},
-    ]
-    log("user_prompt", events, content=user_prompt, tools=[t["function"]["name"] for t in tools])
+    messages = [{"role": "system", "content": system_prompt}]
+    messages += copy.deepcopy(prior_messages or [])
+    messages.append({"role": "user", "content": user_prompt})
+
+    # Untrusted content already in the context counts as taint for the policy
+    if policy is not None:
+        for m in prior_messages or []:
+            if m.get("role") == "tool":
+                policy.observe(m.get("tool_name", ""), False)
+
+    log("user_prompt", events, content=user_prompt,
+        tools=[t["function"]["name"] for t in tools],
+        prior_messages=len(prior_messages or []))
 
     for step in range(max_steps):
         resp = ollama.chat(
