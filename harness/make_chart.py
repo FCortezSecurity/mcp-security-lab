@@ -10,7 +10,7 @@ R = Path("results")
 OUT = Path("docs/img/results.png")
 
 PANELS = [
-    ("S1: injected email (naive payload)", "", "S1-naive",
+    ("S1: injected email (naive payload)", "_S1", "S1-naive",
      ["none", "allowlist", "taint", "allowlist+taint"]),
     ("S2c: poisoned tool, data in its arguments", "_S2c", "S2c-ctx_exfil",
      ["none", "allowlist+taint", "descscan", "egress", "egress2"]),

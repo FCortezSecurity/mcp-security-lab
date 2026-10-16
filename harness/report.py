@@ -33,7 +33,7 @@ lines = [
 ]
 for lb in LABELS:
     u = load(R / f"utility_{lb}.json")
-    a = load(R / f"attack_{lb}.json")
+    a = load(R / f"attack_{lb}_S1.json")
     if not u or not a:
         continue
     fails = ", ".join(
@@ -47,7 +47,7 @@ text = "\n".join(lines)
 print(text)
 (R / "summary.md").write_text(text + "\n", encoding="utf-8")
 
-base = load(R / "attack_none.json")
+base = load(R / "attack_none_S1.json")
 if base:
     print()
     for v in VARIANTS:
