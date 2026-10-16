@@ -4,6 +4,10 @@ A local lab for attacking and defending an LLM agent that uses MCP tools. It mea
 
 Everything runs against this lab only: fake data, local services, and no email ever leaves the machine.
 
+![MCP Agent Security Lab architecture](docs/img/architecture.png)
+
+*Components and data flow. The step-by-step sequence for one agent turn is in [Architecture](#architecture).*
+
 ![Attack success with and without defenses](docs/img/results.png)
 
 *Each bar is 30 trials of one scenario (qwen2.5:7b via Ollama, temperature 0.3). Error bars are 95% Wilson intervals. Red is no defense. The S2c `egress` bar comes from the second of two runs; the first run also had 0 leaks.*
@@ -40,9 +44,7 @@ Two practical lessons from the measurements apply beyond this lab. First, defens
 
 ## Architecture
 
-![MCP Agent Security Lab architecture](docs/img/architecture.png)
-
-*The user's prompt enters the agent loop, which calls the model, passes each requested tool call through the policy hook, and only then runs it on one of the MCP servers. The policy hook returns an allow or block decision (with a reason) to the agent loop, and blocked calls never reach a server. `descscan` is not part of the hook: it filters the tool list before the model sees it (see the sequence below). The harness drives runs and writes results.*
+*The figure at the top of this page shows the components: the user's prompt enters the agent loop, which calls the model, passes each requested tool call through the policy hook, and only then runs it on one of the MCP servers. The policy hook returns an allow or block decision (with a reason) to the agent loop, and blocked calls never reach a server. `descscan` is not part of the hook: it filters the tool list before the model sees it (see the sequence below). The harness drives runs and writes results.*
 
 One turn of the agent, step by step:
 
